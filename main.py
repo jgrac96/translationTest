@@ -8,6 +8,12 @@
 from fastapi import FastAPI, APIRouter
 import argostranslate.package
 import argostranslate.translate
+import wget
+
+# download required packages
+req = ["en_fr", "en_de", "en_es", "en_it", "fr_en", "de_en", "es_en", "it_en"]
+for r_lang_package in req:
+    wget.download("https://argosopentech.nyc3.digitaloceanspaces.com/argospm/translate-"+r_lang_package+"-1_0.argosmodel", r_lang_package+".argosmodel")
 
 # setup API
 app = FastAPI(
@@ -18,7 +24,11 @@ app = FastAPI(
 # setup translation API - install argos translate packages for all the languages in the appropriate directions
 
 languages = ["EN", "DE", "IT", "FR", "ES"]
-print(argostranslate.package.load_available_packages())
+
+# load packages
+for lang_package in req:
+    argostranslate.package.install_from_path(lang_package+".argosmodel")
+
 print(argostranslate.translate.get_installed_languages())
 
 
@@ -56,3 +66,4 @@ def translate(sourceLang: str, targetLang: str, word: str):
 
 
 app.include_router(api_router)
+
